@@ -7,7 +7,8 @@ import server.Message;
 
 public interface ClientIF extends Remote {
 
-	String name = "";
+	String username = "";
+	String color = "";
 	
 	void retrieveMessage(Message message) throws RemoteException;
 	public String getName() throws Exception;

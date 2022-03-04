@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="600.0" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ServerController">
+    <children>
+        <VBox fx:id="messagesVBox" alignment="BOTTOM_CENTER" layoutX="20.0" layoutY="20.0" prefHeight="300.0" prefWidth="546.0" style="-fx-border-color: black; -fx-border-width: 0;" AnchorPane.bottomAnchor="80.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="35.0" AnchorPane.topAnchor="20.0">
+            <opaqueInsets>
+                <Insets />
+            </opaqueInsets>
+        </VBox>
+        <TextArea fx:id="currentMessage" layoutX="55.0" layoutY="241.0" prefHeight="40.0" promptText="Digite aqui..." wrapText="true" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="110.0" />
+        <Button fx:id="sendButton" layoutX="508.0" layoutY="341.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="80.0" text="Enviar" AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="20.0" />
+    </children>
+</AnchorPane>
