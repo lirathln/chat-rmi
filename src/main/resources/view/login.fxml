@@ -16,7 +16,7 @@
    <children>
       <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0">
          <children>
-            <ImageView fx:id="image" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../images/teste.png" />
                </image></ImageView>
@@ -37,7 +37,7 @@
             <Font name="System Bold" size="15.0" />
          </font>
       </Label>
-      <ColorPicker fx:id="textColor" layoutX="425.0" layoutY="203.0" prefHeight="45.0" prefWidth="155.0" promptText="Cor do texto" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="210.0">
+      <ColorPicker fx:id="color" layoutX="425.0" layoutY="203.0" prefHeight="45.0" prefWidth="155.0" promptText="Cor do texto" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="210.0">
          <value>
             <Color />
          </value>

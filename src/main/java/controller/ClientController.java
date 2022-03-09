@@ -8,25 +8,29 @@ import java.rmi.AccessException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
-import javax.swing.JOptionPane;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
-import client.Client;
-import server.Message;
-import server.ServerIF;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
+import model.Client;
+import model.Message;
+import model.SerializableColor;
+import model.ServerIF;
 
 public class ClientController implements PropertyChangeListener, Serializable {
 	
 	private static final long serialVersionUID = -5510985359823935020L;
 	private Client client;
-	private String location = "../view/";
+	private Stage stage;
+	private Parent parent;
 
     @FXML
     private TextArea currentMessage;
@@ -37,30 +41,29 @@ public class ClientController implements PropertyChangeListener, Serializable {
     @FXML
     private ScrollPane scrollPane;
     
-    
-    public ClientController() {
-    	try {
-    		getClient();
-    		scrollPane = new ScrollPane();
-    		messagesVBox = new VBox();
-		} catch (AccessException ae) {
-			ae.printStackTrace();
-		} catch (RemoteException re) {
-			re.printStackTrace();
-		} catch (NotBoundException nbe) {
-			nbe.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	
+    public ClientController() throws AccessException, RemoteException, NotBoundException, Exception {
+    	this.messagesVBox = new VBox();
+    	this.scrollPane = new ScrollPane();	
     }
-
+    
+	public void createScreen(String username, Color color) throws AccessException, RemoteException, NotBoundException, Exception {
+		getClient().setUsername(username);
+		getClient().setColor(new SerializableColor(color));
+		
+		setStage(new Stage());
+		getStage().setTitle(getClient().getUsername());
+		getStage().setScene(new Scene(getParent(), 600, 400));
+		getStage().show();
+	}
+    
 	@FXML
     void sendMessage(MouseEvent event) throws Exception {
     	if (!currentMessage.getText().isEmpty()) {
     		try {
-    			Message message = new Message(getClient().getName(), currentMessage.getText());
+    			Message message = new Message(getClient().getUsername(), currentMessage.getText(), getClient().getColor());
 				getClient().getServer().broadcastMessage(message);
-				refreshPane(message, location + "primary-message.fxml");
+				refreshPane(message, "../view/primary-message.fxml");
 				currentMessage.clear();
 			} catch (RemoteException re) {
 				re.printStackTrace();
@@ -72,8 +75,8 @@ public class ClientController implements PropertyChangeListener, Serializable {
     
     private void refreshPane(Message message, String fxml) throws Exception {
     	Platform.runLater(() -> {
-    		messagesVBox.getChildren().add(loadFXML(fxml, message));
-    		scrollPane.vvalueProperty().bind(messagesVBox.heightProperty());
+    		getMessagesVBox().getChildren().add(loadFXML(fxml, message));
+    		getScrollPane().vvalueProperty().bind(messagesVBox.heightProperty());
     	});
     }
     
@@ -81,22 +84,26 @@ public class ClientController implements PropertyChangeListener, Serializable {
     	try {
     		FXMLLoader fxml = new FXMLLoader(getClass().getResource(file));
     		Parent parent = fxml.load();
+    		
     		MessageController controller = fxml.getController();
-    		controller.getUsername().setText(message.getUser());
+    		controller.getUsername().setText(message.getUsername());
     		controller.getMessageArea().setText(message.getContent());
+    		
+    		String style = "-fx-background-radius: 5;";
+    		style += " -fx-background-color: " + message.getColor().getHexStringColor() + ";";
+    		controller.especifyStyle(style, (message.getColor().isBackgroundDark() ? "WHITE" : "BLACK"));
     		
 			return parent;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-    	
 		return null;
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
     	try { 
-			refreshPane((Message) evt.getNewValue(), location + "secundary-message.fxml");
+			refreshPane((Message) evt.getNewValue(), "../view/secundary-message.fxml");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -104,14 +111,20 @@ public class ClientController implements PropertyChangeListener, Serializable {
     
 	public Client getClient() throws AccessException, RemoteException, NotBoundException, Exception {
 		if(client == null)
-			client = new Client(JOptionPane.showInputDialog("Insira o nome: "), (ServerIF) LocateRegistry.getRegistry(1099).lookup("chat-rmi"), this);
+			client = new Client((ServerIF) LocateRegistry.getRegistry(1099).lookup("chat-rmi"), this);
 		return client;
 	}
 
-	public VBox getMessagesVBox() {
-		if (messagesVBox == null)
-			messagesVBox = new VBox();
-		return messagesVBox;
-	}
-	
+	public VBox getMessagesVBox() { return messagesVBox; }
+
+	public Stage getStage() { return stage; }
+
+	public void setStage(Stage stage) { this.stage = stage; }
+
+	public Parent getParent() { return parent; }
+
+	public void setParent(Parent parent) { this.parent = parent; }
+
+	public ScrollPane getScrollPane() {	return scrollPane; }
+
 }
