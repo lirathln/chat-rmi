@@ -9,6 +9,5 @@ public interface ClientIF extends Remote {
 	
 	void retrieveMessage(Message message) throws RemoteException;
 	String getUsername() throws Exception;
-//	void setUsername(String username) throws Exception;
 	
 }

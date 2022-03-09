@@ -44,7 +44,7 @@ public class ClientController implements PropertyChangeListener, Serializable {
 	
     public ClientController() throws AccessException, RemoteException, NotBoundException, Exception {
     	this.messagesVBox = new VBox();
-    	this.scrollPane = new ScrollPane();	
+    	this.scrollPane = new ScrollPane();
     }
     
 	public void createScreen(String username, Color color) throws AccessException, RemoteException, NotBoundException, Exception {
@@ -59,14 +59,14 @@ public class ClientController implements PropertyChangeListener, Serializable {
     
 	@FXML
     void sendMessage(MouseEvent event) throws Exception {
-    	if (!currentMessage.getText().isEmpty()) {
+    	if (!getCurrentMessage().getText().isEmpty()) {
     		try {
-    			Message message = new Message(getClient().getUsername(), currentMessage.getText(), getClient().getColor());
+    			Message message = new Message(getClient().getUsername(), getCurrentMessage().getText(), getClient().getColor());
 				getClient().getServer().broadcastMessage(message);
 				refreshPane(message, "../view/primary-message.fxml");
-				currentMessage.clear();
-			} catch (RemoteException re) {
-				re.printStackTrace();
+				getCurrentMessage().clear();
+			} catch (RemoteException e) {
+				e.printStackTrace();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -114,6 +114,10 @@ public class ClientController implements PropertyChangeListener, Serializable {
 			client = new Client((ServerIF) LocateRegistry.getRegistry(1099).lookup("chat-rmi"), this);
 		return client;
 	}
+
+	public TextArea getCurrentMessage() { return currentMessage; }
+
+	public void setCurrentMessage(TextArea currentMessage) { this.currentMessage = currentMessage; }
 
 	public VBox getMessagesVBox() { return messagesVBox; }
 

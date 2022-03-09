@@ -11,12 +11,10 @@ public class ServerRMI extends UnicastRemoteObject implements ServerIF {
 	private static List<ClientIF> clients;
 
 	
-	public ServerRMI() throws RemoteException { }
-	
-	public ServerRMI(List<ClientIF> clients) throws RemoteException {
-		setClients(clients);
+	public ServerRMI() throws RemoteException {
+		ServerRMI.clients = new ArrayList<ClientIF>();
 	}
-
+	
 	@Override
 	public synchronized void registerClient(ClientIF client) throws RemoteException {
 		getClients().add(client);
@@ -33,19 +31,12 @@ public class ServerRMI extends UnicastRemoteObject implements ServerIF {
 	@Override
 	public boolean checkUsernames(String name) throws Exception {
 		for (ClientIF clientIF : getClients()) {
-			if (clientIF.getUsername().equals(name)) {
+			if (clientIF.getUsername().equals(name))
 				return true;
-			}
 		}
 		return false;
 	}
 	
-	public static List<ClientIF> getClients() {
-		if (clients == null)
-			clients = new ArrayList<ClientIF>();
-		return clients;
-	}
-
-	public void setClients(List<ClientIF> clients) { ServerRMI.clients = clients; }
+	public static List<ClientIF> getClients() { return ServerRMI.clients;	}
 
 }

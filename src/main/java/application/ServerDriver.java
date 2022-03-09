@@ -1,23 +1,29 @@
 package application;
 
-import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
+import java.net.UnknownHostException;
+import java.rmi.NotBoundException;
 
-import model.ServerRMI;
+import factory.ServerControllerFactory;
+import javafx.application.Application;
+import javafx.stage.Stage;
 
-public class ServerDriver {
+public class ServerDriver extends Application {
 	
-	public static void main(String[] args) {
+	@Override
+	public void start(Stage primaryStage) {
 		try {
-			Registry registry = LocateRegistry.createRegistry(1099);
-            registry.rebind("chat-rmi", new ServerRMI());
-			System.out.println("Server online!");
-		} catch (RemoteException re) {
-			re.printStackTrace();
+			ServerControllerFactory.getInstance().createScreen();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		} catch (NotBoundException e) {
+			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static void main(String[] args) {
+		launch();
 	}
 	
 }

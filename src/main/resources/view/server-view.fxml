@@ -1,19 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="600.0" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ServerController">
-    <children>
-        <VBox fx:id="messagesVBox" alignment="BOTTOM_CENTER" layoutX="20.0" layoutY="20.0" prefHeight="300.0" prefWidth="546.0" style="-fx-border-color: black; -fx-border-width: 0;" AnchorPane.bottomAnchor="80.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="35.0" AnchorPane.topAnchor="20.0">
-            <opaqueInsets>
-                <Insets />
-            </opaqueInsets>
-        </VBox>
-        <TextArea fx:id="currentMessage" layoutX="55.0" layoutY="241.0" prefHeight="40.0" promptText="Digite aqui..." wrapText="true" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="110.0" />
-        <Button fx:id="sendButton" layoutX="508.0" layoutY="341.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="80.0" text="Enviar" AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="20.0" />
-    </children>
+   <children>
+      <Label layoutX="38.0" layoutY="41.0" prefHeight="21.0" prefWidth="250.0" text="IP" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="320.0" AnchorPane.topAnchor="30.0">
+         <font>
+            <Font name="System Bold" size="15.0" />
+         </font>
+      </Label>
+      <TextField fx:id="host" layoutX="30.0" layoutY="55.0" prefHeight="25.0" prefWidth="250.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="320.0" AnchorPane.topAnchor="55.0">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </TextField>
+      <Label layoutX="300.0" layoutY="30.0" prefHeight="21.0" prefWidth="100.0" text="Porta" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="30.0">
+         <font>
+            <Font name="System Bold" size="15.0" />
+         </font>
+      </Label>
+      <TextField fx:id="port" layoutX="300.0" layoutY="55.0" minWidth="100.0" prefHeight="25.0" prefWidth="100.0" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="55.0">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </TextField>
+      <Label layoutX="420.0" layoutY="30.0" prefWidth="150.0" text="Nome do serviço" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="30.0">
+         <font>
+            <Font name="System Bold" size="15.0" />
+         </font>
+      </Label>
+      <TextField fx:id="service" layoutX="436.0" layoutY="55.0" prefWidth="150.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="55.0">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </TextField>
+      <ScrollPane fx:id="scrollPane" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="85.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="95.0">
+         <content>
+            <VBox fx:id="clientsConnected" />
+         </content>
+      </ScrollPane>
+      <HBox alignment="CENTER" prefWidth="200.0" spacing="20.0" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+         <children>
+            <Button mnemonicParsing="false" onMouseClicked="#handleConnectServer" prefHeight="40.0" prefWidth="200.0" text="Iniciar Servidor">
+               <graphic>
+                  <ImageView fitHeight="36.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true" style="-fx-translate-x: -10;" />
+               </graphic>
+               <font>
+                  <Font name="System Bold" size="15.0" />
+               </font>
+            </Button>
+         </children>
+      </HBox>
+   </children>
 </AnchorPane>
