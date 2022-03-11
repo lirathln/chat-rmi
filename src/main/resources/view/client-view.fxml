@@ -6,6 +6,7 @@
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="300.0" minWidth="300.0" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ClientController">
     <children>
@@ -24,7 +25,13 @@
             <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
          </padding>
       </ScrollPane>
-        <TextArea fx:id="currentMessage" layoutX="20.0" layoutY="241.0" prefHeight="40.0" prefWidth="375.0" promptText="Digite aqui..." wrapText="true" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="110.0" />
-        <Button layoutX="508.0" layoutY="341.0" mnemonicParsing="false" onMouseClicked="#sendMessage" prefHeight="40.0" prefWidth="80.0" text="Enviar" AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="20.0" />
+        <TextArea fx:id="currentMessage" layoutX="20.0" layoutY="241.0" prefHeight="40.0" prefWidth="470.0" promptText="Digite aqui..." wrapText="true" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="110.0">
+         <font>
+            <Font size="15.0" />
+         </font></TextArea>
+        <Button layoutX="508.0" layoutY="341.0" mnemonicParsing="false" onMouseClicked="#sendMessage" prefHeight="47.0" prefWidth="80.0" text="Enviar" AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="20.0">
+         <font>
+            <Font name="System Bold" size="15.0" />
+         </font></Button>
     </children>
 </AnchorPane>

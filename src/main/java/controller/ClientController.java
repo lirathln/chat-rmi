@@ -58,7 +58,7 @@ public class ClientController implements PropertyChangeListener, Serializable {
 	}
     
 	@FXML
-    void sendMessage(MouseEvent event) throws Exception {
+    void sendMessage(MouseEvent event) {
     	if (!getCurrentMessage().getText().isEmpty()) {
     		try {
     			Message message = new Message(getClient().getUsername(), getCurrentMessage().getText(), getClient().getColor());
@@ -71,16 +71,17 @@ public class ClientController implements PropertyChangeListener, Serializable {
 				e.printStackTrace();
 			}
     	}
-    }
+	}
     
     private void refreshPane(Message message, String fxml) throws Exception {
     	Platform.runLater(() -> {
-    		getMessagesVBox().getChildren().add(loadFXML(fxml, message));
+    		getMessagesVBox().getChildren().add(loadFXML(message, fxml));
     		getScrollPane().vvalueProperty().bind(messagesVBox.heightProperty());
+    		System.out.println("OK refresh");
     	});
     }
     
-    private Parent loadFXML(String file, Message message) {
+    private Parent loadFXML(Message message, String file) {
     	try {
     		FXMLLoader fxml = new FXMLLoader(getClass().getResource(file));
     		Parent parent = fxml.load();
@@ -89,8 +90,8 @@ public class ClientController implements PropertyChangeListener, Serializable {
     		controller.getUsername().setText(message.getUsername());
     		controller.getMessageArea().setText(message.getContent());
     		
-    		String style = "-fx-background-radius: 5;";
-    		style += " -fx-background-color: " + message.getColor().getHexStringColor() + ";";
+    		String style = "-fx-background-radius: 5; ";
+    		style += "-fx-background-color: " + message.getColor().getHexStringColor() + ";";
     		controller.especifyStyle(style, (message.getColor().isBackgroundDark() ? "WHITE" : "BLACK"));
     		
 			return parent;
@@ -103,7 +104,7 @@ public class ClientController implements PropertyChangeListener, Serializable {
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
     	try { 
-			refreshPane((Message) evt.getNewValue(), "../view/secundary-message.fxml");
+    		refreshPane((Message) evt.getNewValue(), "../view/secundary-message.fxml");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
