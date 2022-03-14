@@ -50,9 +50,9 @@
       </ScrollPane>
       <HBox alignment="CENTER" prefWidth="200.0" spacing="20.0" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
          <children>
-            <Button mnemonicParsing="false" onMouseClicked="#handleConnectServer" prefHeight="40.0" prefWidth="200.0" text="Iniciar Servidor">
+            <Button fx:id="buttonServer" mnemonicParsing="false" onMouseClicked="#handleConnectServer" prefHeight="40.0" prefWidth="200.0" text="Iniciar Servidor">
                <graphic>
-                  <ImageView fitHeight="36.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true" style="-fx-translate-x: -10;">
+                  <ImageView fx:id="imageButtonServer" fitHeight="36.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true" style="-fx-translate-x: -10;">
                      <image>
                         <Image url="@../images/começar-100.png" />
                      </image></ImageView>

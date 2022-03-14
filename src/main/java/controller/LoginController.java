@@ -1,6 +1,5 @@
 package controller;
 
-import java.io.Serializable;
 import java.rmi.AccessException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -10,15 +9,13 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import model.ServerIF;
 
-public class LoginController implements Serializable {
+public class LoginController extends Controller {
 
 	private static final long serialVersionUID = -5197400721736490832L;
 	private Stage stage;
@@ -59,15 +56,10 @@ public class LoginController implements Serializable {
 				setAccessPermission(true);
 				getStage().close();
 			}
-			else {
-				Alert alert = new Alert(AlertType.ERROR);
-				alert.setTitle("Erro");
-				alert.setHeaderText(null);
-				alert.setContentText("Esse nome de usuário já está em uso.");
-				alert.show();
-			}
+			else
+				this.errorAlert("Parece que esse nome já está em uso, escolha outro nome para continuarmos!");
 		} catch (Exception e) {
-			e.printStackTrace();
+			this.errorAlert("Procure o administrador para resolução o problema: " + e.getMessage());
 		}
     }
 

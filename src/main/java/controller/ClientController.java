@@ -3,7 +3,6 @@ package controller;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
-import java.io.Serializable;
 import java.rmi.AccessException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -25,7 +24,7 @@ import model.Message;
 import model.SerializableColor;
 import model.ServerIF;
 
-public class ClientController implements PropertyChangeListener, Serializable {
+public class ClientController extends Controller  implements PropertyChangeListener {
 	
 	private static final long serialVersionUID = -5510985359823935020L;
 	private Client client;
@@ -47,14 +46,18 @@ public class ClientController implements PropertyChangeListener, Serializable {
     	this.scrollPane = new ScrollPane();
     }
     
-	public void createScreen(String username, Color color) throws AccessException, RemoteException, NotBoundException, Exception {
-		getClient().setUsername(username);
-		getClient().setColor(new SerializableColor(color));
+	public void createScreen(String username, Color color) {
+		try {
+			getClient().setUsername(username);
+			getClient().setColor(new SerializableColor(color));
 		
-		setStage(new Stage());
-		getStage().setTitle(getClient().getUsername());
-		getStage().setScene(new Scene(getParent(), 600, 400));
-		getStage().show();
+			setStage(new Stage());
+			getStage().setTitle(getClient().getUsername());
+			getStage().setScene(new Scene(getParent(), 600, 400));
+			getStage().show();
+		} catch (Exception e) {
+			this.errorAlert("Procure o administrador para resolução o problema: " + e.getMessage());
+		}
 	}
     
 	@FXML
@@ -66,9 +69,10 @@ public class ClientController implements PropertyChangeListener, Serializable {
 				refreshPane(message, "../view/primary-message.fxml");
 				getCurrentMessage().clear();
 			} catch (RemoteException e) {
-				e.printStackTrace();
+				this.errorAlert("Procure o administrador para resolução o problema: " + e.getMessage());
+				
 			} catch (Exception e) {
-				e.printStackTrace();
+				this.errorAlert("Procure o administrador para resolução o problema: " + e.getMessage());
 			}
     	}
 	}
@@ -96,17 +100,28 @@ public class ClientController implements PropertyChangeListener, Serializable {
     		
 			return parent;
 		} catch (IOException e) {
-			e.printStackTrace();
+			this.errorAlert("Procure o administrador para resolução o problema: " + e.getMessage());
 		}
 		return null;
+    }
+    
+    public void removeClient() { // TESTE
+    	try {
+			getClient().setServer(null);
+			getClient().setPCS(null);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    	
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-    	try { 
-    		refreshPane((Message) evt.getNewValue(), "../view/secundary-message.fxml");
+    	try {
+    		if (evt.getPropertyName() == "newMessage")
+    			refreshPane((Message) evt.getNewValue(), "../view/secundary-message.fxml");
 		} catch (Exception e) {
-			e.printStackTrace();
+			this.errorAlert("Procure o administrador para resolução o problema: " + e.getMessage());
 		}
     }
     

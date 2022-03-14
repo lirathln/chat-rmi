@@ -1,6 +1,5 @@
 package controller;
 
-import java.io.Serializable;
 import java.rmi.RemoteException;
 
 import javafx.fxml.FXML;
@@ -9,7 +8,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import model.ServerIF;
 
-public class ListController implements Serializable {
+public class ListController extends Controller {
 
 	private static final long serialVersionUID = -7027491841452445473L;
 	private ServerIF server;
@@ -34,8 +33,14 @@ public class ListController implements Serializable {
     }
 
     @FXML
-    void removeClient(MouseEvent event) throws NumberFormatException, RemoteException {
-    	getServer().removeClient(Integer.parseInt(getId().getText()) - 1);
+    void removeClient(MouseEvent event) {
+    	try {
+			getServer().removeClient(Integer.parseInt(getId().getText()) - 1);
+		} catch (NumberFormatException e) {
+			this.errorAlert("Procure o administrador para resolução o problema: " + e.getMessage());
+		} catch (RemoteException e) {
+			this.errorAlert("Procure o administrador para resolução o problema: " + e.getMessage());
+		}
     }
     
     

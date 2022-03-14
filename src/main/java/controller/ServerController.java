@@ -3,7 +3,6 @@ package controller;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.rmi.AccessException;
@@ -18,9 +17,12 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -28,7 +30,7 @@ import model.ClientIF;
 import model.Clock;
 import model.ServerRMI;
 
-public class ServerController implements PropertyChangeListener, Serializable {
+public class ServerController extends Controller implements PropertyChangeListener {
 
 	private static final long serialVersionUID = -7385263869628783331L;
 	private Stage stage;
@@ -49,9 +51,15 @@ public class ServerController implements PropertyChangeListener, Serializable {
 
 	@FXML
 	private Label timer;
+	
+	@FXML
+	private Button buttonServer;
+	
+	@FXML
+	private ImageView imageButtonServer;
 
-	// TODO exibir mensagem de conexão
-	// TODO alterar botão no handle
+	// TODO exibir mensagem de conexão de clientes
+	// TODO criar método para remover usuário, informando remoção ao mesmo e desabilitando tela
 	public ServerController() throws UnknownHostException, RemoteException {
 		this.server = new ServerRMI(this); // provavelmente remover
 		this.clock = new Clock();
@@ -62,6 +70,7 @@ public class ServerController implements PropertyChangeListener, Serializable {
 		this.port = new TextField();
 		this.service = new TextField();
 		this.timer = new Label();
+		this.buttonServer = new Button();
 	}
 
 	public void createScreen() throws UnknownHostException {
@@ -77,7 +86,7 @@ public class ServerController implements PropertyChangeListener, Serializable {
 	}
 
 	@FXML
-	void handleConnectServer(MouseEvent event) throws NumberFormatException, RemoteException, NotBoundException {
+	void handleConnectServer(MouseEvent event) {
 		if (getTimer().isDisable())
 			startServer();
 		else
@@ -88,33 +97,40 @@ public class ServerController implements PropertyChangeListener, Serializable {
 		try {
 			getRegistry().rebind(getService().getText(), getServer());
 			getTimer().setDisable(false);
+			
+			getButtonServer().setText("Parar Servidor");
+			getImageButtonServer().setImage(new Image("/images/pausar-100.png"));
 			setThread(new Thread(() -> runTimer()));
 			getThread().start();
-			System.out.println("Server online");
+			this.informationAlert("Server online!");
 		} catch (AccessException e) {
-			e.printStackTrace();
+			this.errorAlert("Falha no serviço: " + e.getMessage());
 		} catch (NumberFormatException e) {
-			e.printStackTrace();
+			this.errorAlert("Falha no serviço: " + e.getMessage());
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			this.errorAlert("Falha no serviço: " + e.getMessage());
 		}
 	}
 	
 	private void stopServer() {
 		try {
-			getRegistry().unbind(getService().getText());
-			UnicastRemoteObject.unexportObject(getServer(), true); // erro ao para servidor pela segunda vez
-			getTimer().setDisable(true);
-			getThread().interrupt();
-			System.out.println("Server offline");
+			if (this.confirmationAlert("Tem certeza que deseja parar o servidor?\nTodos os clientes serão desconectados.")) {
+				getRegistry().unbind(getService().getText());
+				UnicastRemoteObject.unexportObject(getServer(), true); // erro ao para servidor pela segunda vez
+				getTimer().setDisable(true);
+				getThread().interrupt();
+				getButtonServer().setText("Iniciar Servidor");
+				getImageButtonServer().setImage(new Image("/images/começar-100.png"));
+				this.informationAlert("Server offline");
+			}
 		} catch (AccessException e) {
-			e.printStackTrace();
+			this.errorAlert("Falha no serviço: " + e.getMessage());
 		} catch (NumberFormatException e) {
-			e.printStackTrace();
+			this.errorAlert("Falha no serviço: " + e.getMessage());
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			this.errorAlert("Falha no serviço: " + e.getMessage());
 		} catch (NotBoundException e) {
-			e.printStackTrace();
+			this.errorAlert("Falha no serviço: " + e.getMessage());
 		}
 	}
 	
@@ -126,7 +142,7 @@ public class ServerController implements PropertyChangeListener, Serializable {
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				this.errorAlert("Falha no serviço: " + e.getMessage());
 			}
 			getClock().addSecond();
 		}
@@ -153,9 +169,9 @@ public class ServerController implements PropertyChangeListener, Serializable {
     		
     		return parent;
     	} catch (IOException e) {
-    		e.printStackTrace();
+    		this.errorAlert("Falha no serviço: " + e.getMessage());
     	} catch (Exception e) {
-    		e.printStackTrace();
+    		this.errorAlert("Falha no serviço: " + e.getMessage());
     	}
     	return null;
     }
@@ -163,13 +179,12 @@ public class ServerController implements PropertyChangeListener, Serializable {
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
     	try { 
-    		System.out.println(evt.getPropertyName() + " : " + evt.getOldValue());
     		if (evt.getPropertyName() == "registerClient")
     			refreshPane((ClientIF) evt.getNewValue());
 			if (evt.getPropertyName() == "removeClient")
 				getClientsConnected().getChildren().remove(Integer.parseInt(evt.getOldValue().toString()));
 		} catch (Exception e) {
-			e.printStackTrace();
+			this.errorAlert("Falha no serviço: " + e.getMessage());
 		}
     }
 
@@ -214,5 +229,13 @@ public class ServerController implements PropertyChangeListener, Serializable {
 	public Thread getThread() { return thread; }
 
 	public void setThread(Thread thread) { this.thread = thread; }
+
+	public Button getButtonServer() { return buttonServer; }
+
+	public void setButtonServer(Button buttonServer) { this.buttonServer = buttonServer; }
+
+	public ImageView getImageButtonServer() { return imageButtonServer;	}
+
+	public void setImageButtonServer(ImageView imageButtonServer) { this.imageButtonServer = imageButtonServer;	}
 
 }
