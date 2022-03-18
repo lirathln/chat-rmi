@@ -7,16 +7,15 @@ import java.rmi.AccessException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
+import java.util.prefs.Preferences;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import model.Client;
@@ -24,26 +23,23 @@ import model.Message;
 import model.SerializableColor;
 import model.ServerIF;
 
-public class ClientController extends Controller  implements PropertyChangeListener {
+public class ClientController extends Controller implements PropertyChangeListener {
 	
 	private static final long serialVersionUID = -5510985359823935020L;
 	private Client client;
 	private Stage stage;
 	private Parent parent;
+	private MessagePaneController paneMessage;
 
     @FXML
     private TextArea currentMessage;
     
     @FXML
-    private VBox messagesVBox;
-    
-    @FXML
-    private ScrollPane scrollPane;
+    private ScrollPane scrollPane; // TODO scrollPane não recebe Parent de MessagePaneController (enviado em estancia no get)
     
 	
     public ClientController() throws AccessException, RemoteException, NotBoundException, Exception {
-    	this.messagesVBox = new VBox();
-    	this.scrollPane = new ScrollPane();
+    	System.out.println("ClientController");
     }
     
 	public void createScreen(String username, Color color) {
@@ -56,7 +52,7 @@ public class ClientController extends Controller  implements PropertyChangeListe
 			getStage().setScene(new Scene(getParent(), 600, 400));
 			getStage().show();
 		} catch (Exception e) {
-			this.errorAlert("Procure o administrador para resolução o problema: " + e.getMessage());
+			this.errorAlert("Procure o administrador para resolução o problema: \n\t" + e.fillInStackTrace());
 		}
 	}
     
@@ -69,82 +65,69 @@ public class ClientController extends Controller  implements PropertyChangeListe
 				refreshPane(message, "../view/primary-message.fxml");
 				getCurrentMessage().clear();
 			} catch (RemoteException e) {
-				this.errorAlert("Procure o administrador para resolução o problema: " + e.getMessage());
+				this.errorAlert("Procure o administrador para resolução o problema: \n\t" + e.fillInStackTrace());
 				
 			} catch (Exception e) {
-				this.errorAlert("Procure o administrador para resolução o problema: " + e.getMessage());
+				this.errorAlert("Procure o administrador para resolução o problema: \n\t" + e.fillInStackTrace());
 			}
     	}
+	}
+	
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		try {
+			if (evt.getPropertyName() == "newMessage")
+				refreshPane((Message) evt.getNewValue(), "../view/secundary-message.fxml");
+		} catch (Exception e) {
+			this.errorAlert("Procure o administrador para resolução o problema: \n\t" + e.fillInStackTrace());
+		}
 	}
     
     private void refreshPane(Message message, String fxml) throws Exception {
     	Platform.runLater(() -> {
-    		getMessagesVBox().getChildren().add(loadFXML(message, fxml));
-    		getScrollPane().vvalueProperty().bind(messagesVBox.heightProperty());
-    		System.out.println("OK refresh");
+    		try {
+				getPaneMessage().addMessage(message, fxml);
+				getScrollPane().vvalueProperty().bind(getPaneMessage().getMessagesVBox().heightProperty());
+			} catch (IOException e) {
+				this.errorAlert("Procure o administrador para resolução o problema: \n\t" + e.fillInStackTrace());
+			} catch (NotBoundException e) {
+				this.errorAlert("Procure o administrador para resolução o problema: \n\t" + e.fillInStackTrace());
+			} catch (Exception e) {
+				this.errorAlert("Procure o administrador para resolução o problema: \n\t" + e.fillInStackTrace());
+			}
     	});
     }
     
-    private Parent loadFXML(Message message, String file) {
-    	try {
-    		FXMLLoader fxml = new FXMLLoader(getClass().getResource(file));
-    		Parent parent = fxml.load();
-    		
-    		MessageController controller = fxml.getController();
-    		controller.getUsername().setText(message.getUsername());
-    		controller.getMessageArea().setText(message.getContent());
-    		
-    		String style = "-fx-background-radius: 5; ";
-    		style += "-fx-background-color: " + message.getColor().getHexStringColor() + ";";
-    		controller.especifyStyle(style, (message.getColor().isBackgroundDark() ? "WHITE" : "BLACK"));
-    		
-			return parent;
-		} catch (IOException e) {
-			this.errorAlert("Procure o administrador para resolução o problema: " + e.getMessage());
-		}
-		return null;
-    }
-    
-    public void removeClient() { // TESTE
-    	try {
-			getClient().setServer(null);
-			getClient().setPCS(null);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-    	
-    }
-
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-    	try {
-    		if (evt.getPropertyName() == "newMessage")
-    			refreshPane((Message) evt.getNewValue(), "../view/secundary-message.fxml");
-		} catch (Exception e) {
-			this.errorAlert("Procure o administrador para resolução o problema: " + e.getMessage());
-		}
-    }
-    
 	public Client getClient() throws AccessException, RemoteException, NotBoundException, Exception {
-		if(client == null)
-			client = new Client((ServerIF) LocateRegistry.getRegistry(1099).lookup("chat-rmi"), this);
+		if(client == null) {
+			ServerIF server = (ServerIF) LocateRegistry.getRegistry(
+					Integer.parseInt(Preferences.userRoot().get("port", null)))
+					.lookup(Preferences.userRoot().get("service", null));
+			client = new Client(server, this);
+		}
 		return client;
 	}
 
 	public TextArea getCurrentMessage() { return currentMessage; }
 
-	public void setCurrentMessage(TextArea currentMessage) { this.currentMessage = currentMessage; }
-
-	public VBox getMessagesVBox() { return messagesVBox; }
-
 	public Stage getStage() { return stage; }
 
-	public void setStage(Stage stage) { this.stage = stage; }
+	public void setStage(Stage stage) { this.stage = stage;	}
+
+	public ScrollPane getScrollPane() throws NotBoundException, Exception {	
+		if (scrollPane == null)
+			scrollPane = new ScrollPane(getPaneMessage().getParent());
+		return scrollPane; 
+	}
+	
+	public MessagePaneController getPaneMessage() throws NotBoundException, Exception { 
+		if (paneMessage == null)
+			paneMessage = new MessagePaneController();
+		return paneMessage;	
+	}
 
 	public Parent getParent() { return parent; }
 
 	public void setParent(Parent parent) { this.parent = parent; }
-
-	public ScrollPane getScrollPane() {	return scrollPane; }
 
 }

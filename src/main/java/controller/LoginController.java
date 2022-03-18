@@ -4,6 +4,7 @@ import java.rmi.AccessException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
+import java.util.prefs.Preferences;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -51,7 +52,9 @@ public class LoginController extends Controller {
 	@FXML
     void accessChat(ActionEvent event) throws AccessException, RemoteException, NotBoundException, Exception {
 		try {
-			ServerIF server = (ServerIF) LocateRegistry.getRegistry(1099).lookup("chat-rmi");
+			int port = Integer.parseInt(Preferences.userRoot().get("port", null));
+			String service = Preferences.userRoot().get("service", null);
+			ServerIF server = (ServerIF) LocateRegistry.getRegistry(port).lookup(service);
 			if (!server.checkUsernames(username.getText())) {
 				setAccessPermission(true);
 				getStage().close();
@@ -59,7 +62,8 @@ public class LoginController extends Controller {
 			else
 				this.errorAlert("Parece que esse nome já está em uso, escolha outro nome para continuarmos!");
 		} catch (Exception e) {
-			this.errorAlert("Procure o administrador para resolução o problema: " + e.getMessage());
+			e.printStackTrace();
+			this.errorAlert("Procure o administrador para resolução o problema: \n\t" + e.fillInStackTrace());
 		}
     }
 

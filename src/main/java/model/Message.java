@@ -1,20 +1,16 @@
 package model;
 
-import java.io.Serializable;
-
 import javafx.scene.paint.Color;
 
-
-public class Message implements Serializable {
+public class Message extends Notification {
 
     private static final long serialVersionUID = 1654202436656698275L;
 	private String username;
     private String content;
-    private SerializableColor color;
 
 	
     public Message() {
-    	setUsername("username");
+    	setUsername("");
         setContent("");
         setColor(new SerializableColor(Color.BLACK));
     }
@@ -32,9 +28,5 @@ public class Message implements Serializable {
     public String getContent() { return content; }
 
     public void setContent(String content) { this.content = content; }
-
-	public SerializableColor getColor() { return color; }
-
-	public void setColor(SerializableColor color) { this.color = color; }
 
 }

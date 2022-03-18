@@ -11,6 +11,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.prefs.Preferences;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -97,6 +98,7 @@ public class ServerController extends Controller implements PropertyChangeListen
 		try {
 			getRegistry().rebind(getService().getText(), getServer());
 			getTimer().setDisable(false);
+			setPreferencesData();
 			
 			getButtonServer().setText("Parar Servidor");
 			getImageButtonServer().setImage(new Image("/images/pausar-100.png"));
@@ -104,12 +106,18 @@ public class ServerController extends Controller implements PropertyChangeListen
 			getThread().start();
 			this.informationAlert("Server online!");
 		} catch (AccessException e) {
-			this.errorAlert("Falha no serviço: " + e.getMessage());
+			this.errorAlert("Falha no serviço: " + e.getCause());
 		} catch (NumberFormatException e) {
-			this.errorAlert("Falha no serviço: " + e.getMessage());
+			this.errorAlert("Falha no serviço: " + e.getCause());
 		} catch (RemoteException e) {
-			this.errorAlert("Falha no serviço: " + e.getMessage());
+			this.errorAlert("Falha no serviço: " + e.getCause());
 		}
+	}
+	
+	private void setPreferencesData() {
+		Preferences.userRoot().put("host", getHost().getText());
+		Preferences.userRoot().put("port", getPort().getText());
+		Preferences.userRoot().put("service", getService().getText());
 	}
 	
 	private void stopServer() {
@@ -124,13 +132,13 @@ public class ServerController extends Controller implements PropertyChangeListen
 				this.informationAlert("Server offline");
 			}
 		} catch (AccessException e) {
-			this.errorAlert("Falha no serviço: " + e.getMessage());
+			this.errorAlert("Falha no serviço: " + e.getCause());
 		} catch (NumberFormatException e) {
-			this.errorAlert("Falha no serviço: " + e.getMessage());
+			this.errorAlert("Falha no serviço: " + e.getCause());
 		} catch (RemoteException e) {
-			this.errorAlert("Falha no serviço: " + e.getMessage());
+			this.errorAlert("Falha no serviço: " + e.getCause());
 		} catch (NotBoundException e) {
-			this.errorAlert("Falha no serviço: " + e.getMessage());
+			this.errorAlert("Falha no serviço: " + e.getCause());
 		}
 	}
 	
@@ -142,7 +150,7 @@ public class ServerController extends Controller implements PropertyChangeListen
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
-				this.errorAlert("Falha no serviço: " + e.getMessage());
+				this.errorAlert("Falha no serviço: " + e.getCause());
 			}
 			getClock().addSecond();
 		}
@@ -169,9 +177,9 @@ public class ServerController extends Controller implements PropertyChangeListen
     		
     		return parent;
     	} catch (IOException e) {
-    		this.errorAlert("Falha no serviço: " + e.getMessage());
+    		this.errorAlert("Falha no serviço: " + e.getCause());
     	} catch (Exception e) {
-    		this.errorAlert("Falha no serviço: " + e.getMessage());
+    		this.errorAlert("Falha no serviço: " + e.getCause());
     	}
     	return null;
     }
@@ -181,10 +189,11 @@ public class ServerController extends Controller implements PropertyChangeListen
     	try { 
     		if (evt.getPropertyName() == "registerClient")
     			refreshPane((ClientIF) evt.getNewValue());
-			if (evt.getPropertyName() == "removeClient")
+			if (evt.getPropertyName() == "removeClient") {
 				getClientsConnected().getChildren().remove(Integer.parseInt(evt.getOldValue().toString()));
+			}
 		} catch (Exception e) {
-			this.errorAlert("Falha no serviço: " + e.getMessage());
+			this.errorAlert("Falha no serviço: " + e.getCause());
 		}
     }
 

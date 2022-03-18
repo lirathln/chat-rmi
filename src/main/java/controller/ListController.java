@@ -37,9 +37,9 @@ public class ListController extends Controller {
     	try {
 			getServer().removeClient(Integer.parseInt(getId().getText()) - 1);
 		} catch (NumberFormatException e) {
-			this.errorAlert("Procure o administrador para resolução o problema: " + e.getMessage());
+			this.errorAlert("Procure o administrador para resolução o problema: \n\t" + e.fillInStackTrace());
 		} catch (RemoteException e) {
-			this.errorAlert("Procure o administrador para resolução o problema: " + e.getMessage());
+			this.errorAlert("Procure o administrador para resolução o problema: \n\t" + e.fillInStackTrace());
 		}
     }
     

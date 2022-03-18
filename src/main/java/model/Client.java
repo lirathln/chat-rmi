@@ -31,7 +31,12 @@ public class Client extends UnicastRemoteObject implements ClientIF {
 		getServer().registerClient(this);
 		getPCS().addPropertyChangeListener(observer);
 	}
-
+	
+	@Override
+	public void notifyClients(Notification notification) throws RemoteException {
+		getPCS().firePropertyChange("notification", null, notification);
+	}
+	
 	public void retrieveMessage(Message message) throws RemoteException {
 		getPCS().firePropertyChange("newMessage", null, message);
 	}

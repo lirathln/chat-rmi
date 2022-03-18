@@ -29,10 +29,12 @@ public class ServerRMI extends UnicastRemoteObject implements ServerIF {
 	public synchronized void registerClient(ClientIF client) throws RemoteException {
 		getClients().add(client);
 		getPCS().firePropertyChange("registerClient", null, client);
+		getPCS().firePropertyChange("notification", null, "novo cliente"); // disparar para ClientCOntroller
 	}
 	
 	@Override
 	public synchronized void removeClient(int id) throws RemoteException {
+		// TODO mandar notificações para clientes
 		getPCS().firePropertyChange("removeClient", id, null);
 		getClients().remove(getClients().get(id));
 	}
