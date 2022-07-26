@@ -5,18 +5,28 @@ import java.io.IOException;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import model.Message;
 import model.Notification;
 
 public class MessagePaneController extends Controller {
 
 	private static final long serialVersionUID = -565783155972532418L;
+	private Stage stage;
 	private Parent parent;
 	
 	@FXML
 	private VBox messagesVBox;
 	
+	
+    public void createScreen() {
+    	this.setStage(new Stage());
+    	getStage().setTitle("Login");
+    	getStage().setScene(new Scene(parent, 600, 400));
+    	getStage().showAndWait();
+    }
 	
 	public MessagePaneController() {
 		System.out.println("MessagePaneController");
@@ -28,9 +38,7 @@ public class MessagePaneController extends Controller {
 	
 	public void addMessage(Message message, String file) {
 		getMessagesVBox().getChildren().add(loadFXML(message, file));
-		System.out.println(message.getUsername() + " : " + message.getContent());
-		System.out.println("Size: " + getMessagesVBox().getPrefHeight() + " : " + getMessagesVBox().getPrefWidth());
-		
+		System.out.println(message.getContent());
 	}
 	
     private Parent loadFXML(Notification message, String file) {
@@ -54,6 +62,7 @@ public class MessagePaneController extends Controller {
 		} catch (IOException e) {
 			this.errorAlert("Procure o administrador para resolução o problema: \n\t" + e.fillInStackTrace());
 		}
+    	System.out.println("\n\tNULL");
 		return null;
     }
 
@@ -71,4 +80,7 @@ public class MessagePaneController extends Controller {
 
 	public void setParent(Parent parent) { this.parent = parent; }
 
+	public Stage getStage() { return stage; }
+
+	public void setStage(Stage stage) { this.stage = stage; }
 }
