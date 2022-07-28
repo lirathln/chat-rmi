@@ -37,7 +37,7 @@ public class Client extends UnicastRemoteObject implements ClientIF {
 		getPCS().firePropertyChange("notification", null, notification);
 	}
 	
-	public void retrieveMessage(Message message) throws RemoteException {
+	public void retrieveMessage(Notification message) throws RemoteException {
 		getPCS().firePropertyChange("newMessage", null, message);
 	}
 	

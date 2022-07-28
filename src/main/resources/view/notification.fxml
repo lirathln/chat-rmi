@@ -6,9 +6,9 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane minHeight="40.0" minWidth="200.0" nodeOrientation="RIGHT_TO_LEFT" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.NotificationController">
+<AnchorPane minHeight="40.0" minWidth="200.0" nodeOrientation="RIGHT_TO_LEFT" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.NotificationController">
    <children>
-      <HBox alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <HBox alignment="CENTER" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="10.0">
          <children>
             <Label fx:id="notification" alignment="CENTER" minHeight="40.0" minWidth="100.0" style="-fx-background-radius: 30;" textAlignment="CENTER" wrapText="true">
                <font>

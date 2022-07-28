@@ -3,8 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.layout.VBox?>
 
-
-<VBox fx:id="messagesVBox" alignment="BOTTOM_CENTER" minHeight="300.0" minWidth="560.0" spacing="20.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MessagePaneController">
+<VBox fx:id="messagesVBox" alignment="BOTTOM_CENTER" minHeight="300.0" minWidth="560.0" spacing="20.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MessagePaneController">
    <opaqueInsets>
       <Insets />
    </opaqueInsets>

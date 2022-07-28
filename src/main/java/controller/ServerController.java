@@ -13,6 +13,7 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.prefs.Preferences;
 
+import factory.MessagePaneControllerFactory;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -29,6 +30,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.ClientIF;
 import model.Clock;
+import model.Notification;
 import model.ServerRMI;
 
 public class ServerController extends Controller implements PropertyChangeListener {
@@ -49,6 +51,11 @@ public class ServerController extends Controller implements PropertyChangeListen
 
 	@FXML
 	private ScrollPane scrollPane;
+	
+	@FXML
+	private ScrollPane serverNotification;
+	
+	private MessagePaneController paneMessage;
 
 	@FXML
 	private Label timer;
@@ -58,7 +65,7 @@ public class ServerController extends Controller implements PropertyChangeListen
 	
 	@FXML
 	private ImageView imageButtonServer;
-
+	
 	// TODO exibir mensagem de conexão de clientes
 	// TODO criar método para remover usuário, informando remoção ao mesmo e desabilitando tela
 	public ServerController() throws UnknownHostException, RemoteException {
@@ -67,6 +74,7 @@ public class ServerController extends Controller implements PropertyChangeListen
 		
 		this.clientsConnected = new VBox();
 		this.scrollPane = new ScrollPane();
+		this.serverNotification = new ScrollPane();
 		this.host = new TextField();
 		this.port = new TextField();
 		this.service = new TextField();
@@ -87,14 +95,14 @@ public class ServerController extends Controller implements PropertyChangeListen
 	}
 
 	@FXML
-	void handleConnectServer(MouseEvent event) {
+	void handleConnectServer(MouseEvent event) throws Exception {
 		if (getTimer().isDisable())
 			startServer();
 		else
 			stopServer();
 	}
 	
-	private void startServer() {
+	private void startServer() throws Exception {
 		try {
 			getRegistry().rebind(getService().getText(), getServer());
 			getTimer().setDisable(false);
@@ -104,7 +112,7 @@ public class ServerController extends Controller implements PropertyChangeListen
 			getImageButtonServer().setImage(new Image("/images/pausar-100.png"));
 			setThread(new Thread(() -> runTimer()));
 			getThread().start();
-			this.informationAlert("Server online!");
+			sendNotification("Server online!");
 		} catch (AccessException e) {
 			this.errorAlert("Falha no serviço: " + e.getCause());
 		} catch (NumberFormatException e) {
@@ -120,7 +128,7 @@ public class ServerController extends Controller implements PropertyChangeListen
 		Preferences.userRoot().put("service", getService().getText());
 	}
 	
-	private void stopServer() {
+	private void stopServer() throws Exception {
 		try {
 			if (this.confirmationAlert("Tem certeza que deseja parar o servidor?\nTodos os clientes serão desconectados.")) {
 				getRegistry().unbind(getService().getText());
@@ -129,7 +137,7 @@ public class ServerController extends Controller implements PropertyChangeListen
 				getThread().interrupt();
 				getButtonServer().setText("Iniciar Servidor");
 				getImageButtonServer().setImage(new Image("/images/começar-100.png"));
-				this.informationAlert("Server offline");
+				sendNotification("Server offline!");
 			}
 		} catch (AccessException e) {
 			this.errorAlert("Falha no serviço: " + e.getCause());
@@ -144,9 +152,7 @@ public class ServerController extends Controller implements PropertyChangeListen
 	
 	private void runTimer() {
 		while (!getTimer().isDisable()) {
-			Platform.runLater(() -> {
-				getTimer().setText(getClock().timerString());
-			});
+			Platform.runLater(() -> getTimer().setText(getClock().timerString()));
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
@@ -159,9 +165,7 @@ public class ServerController extends Controller implements PropertyChangeListen
 	}
 	
     private void refreshPane(ClientIF client) throws Exception {
-    	Platform.runLater(() -> {
-    		getClientsConnected().getChildren().add(loadFXML(client));
-    	});
+    	Platform.runLater(() -> getClientsConnected().getChildren().add(loadFXML(client)));
     }
 	
     private Parent loadFXML(ClientIF client) {
@@ -174,7 +178,9 @@ public class ServerController extends Controller implements PropertyChangeListen
     		controller.getId().setText(Integer.toString(ServerRMI.getClients().size()));
     		controller.getUsername().setText(client.getUsername());
     		controller.getColor().setText(client.getColor().getHexStringColor());
-    		
+//    		System.out.println(controller.getUsername().getText());
+//    		setClientName(controller.getUsername().getText().toString());
+    
     		return parent;
     	} catch (IOException e) {
     		this.errorAlert("Falha no serviço: " + e.getCause());
@@ -184,13 +190,38 @@ public class ServerController extends Controller implements PropertyChangeListen
     	return null;
     }
     
+    public void sendNotification(String message) throws RemoteException, Exception {
+    	Notification notification = new Notification(message); 
+    	getServer().serverBroadcast(notification);
+    	refreshPane(notification, "../view/notification.fxml");
+    }
+    
+	private void refreshPane(Notification notification, String fxml) throws Exception {
+		Platform.runLater(() -> {
+			try {
+				getPaneMessage().addNotification(notification, fxml);
+				getScrollPane().vvalueProperty().bind(getPaneMessage().getMessagesVBox().heightProperty());
+			} catch (IOException e) {
+				this.errorAlert("Procure o administrador para resolução o problema: \n\t" + e.fillInStackTrace());
+			} catch (NotBoundException e) {
+				this.errorAlert("Procure o administrador para resolução o problema: \n\t" + e.fillInStackTrace());
+			} catch (Exception e) {
+				this.errorAlert("Procure o administrador para resolução o problema: \n\t" + e.fillInStackTrace());
+			}
+		});
+	}
+    
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
     	try { 
-    		if (evt.getPropertyName() == "registerClient")
+    		if (evt.getPropertyName() == "registerClient") {
     			refreshPane((ClientIF) evt.getNewValue());
+    		}
 			if (evt.getPropertyName() == "removeClient") {
 				getClientsConnected().getChildren().remove(Integer.parseInt(evt.getOldValue().toString()));
+			}
+			if (evt.getPropertyName() == "notification") {
+				sendNotification(evt.getNewValue().toString()); // TODO verificar identidade de usuário
 			}
 		} catch (Exception e) {
 			this.errorAlert("Falha no serviço: " + e.getCause());
@@ -232,6 +263,21 @@ public class ServerController extends Controller implements PropertyChangeListen
 	public void setService(TextField service) { this.service = service;	}
 
 	public ScrollPane getScrollPane() { return scrollPane;	}
+	
+	public ScrollPane getServerNotification() throws IOException, NotBoundException, Exception {
+		if (serverNotification == null)
+			serverNotification = new ScrollPane();
+		return serverNotification;
+	}
+	
+	private MessagePaneController getPaneMessage() throws NotBoundException, Exception {
+		if (paneMessage == null) {
+			paneMessage = MessagePaneControllerFactory.getInstance();
+			paneMessage.getParent().setStyle("-fx-alignment: TOP_CENTER;");
+			getServerNotification().setContent(paneMessage.getParent());
+		}
+		return paneMessage;
+	}
 
 	public Label getTimer() { return timer;	}
 

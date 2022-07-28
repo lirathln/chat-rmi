@@ -51,6 +51,7 @@ public class ClientController extends Controller implements PropertyChangeListen
 			getStage().setTitle(getClient().getUsername());
 			getStage().setScene(new Scene(getParent(), 600, 400));
 			getStage().show();
+			
 		} catch (Exception e) {
 			this.errorAlert("Procure o administrador para resolução o problema: \n\t" + e.fillInStackTrace());
 		}
@@ -91,7 +92,7 @@ public class ClientController extends Controller implements PropertyChangeListen
 				getScrollPane().vvalueProperty().bind(getPaneMessage().getMessagesVBox().heightProperty());
 			} catch (IOException e) {
 				this.errorAlert("Procure o administrador para resolução o problema: \n\t" + e.fillInStackTrace());
-			} catch (NotBoundException e) {
+			} catch (NotBoundException e) { // TODO informar mensagens personalizadas
 				this.errorAlert("Procure o administrador para resolução o problema: \n\t" + e.fillInStackTrace());
 			} catch (Exception e) {
 				this.errorAlert("Procure o administrador para resolução o problema: \n\t" + e.fillInStackTrace());
@@ -122,16 +123,16 @@ public class ClientController extends Controller implements PropertyChangeListen
 	}
 
 	public ScrollPane getScrollPane() throws NotBoundException, Exception {
-		if (scrollPane == null) {
+		if (scrollPane == null)
 			scrollPane = new ScrollPane();
-			scrollPane.setContent(paneMessage.getParent());
-		}
 		return scrollPane;
 	}
 
 	public MessagePaneController getPaneMessage() throws NotBoundException, Exception {
-		if (paneMessage == null)
+		if (paneMessage == null) {
 			paneMessage = MessagePaneControllerFactory.getInstance();
+			getScrollPane().setContent(paneMessage.getParent());
+		}
 		return paneMessage;
 	}
 

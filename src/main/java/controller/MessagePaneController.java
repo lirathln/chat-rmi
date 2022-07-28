@@ -32,13 +32,12 @@ public class MessagePaneController extends Controller {
 		System.out.println("MessagePaneController");
 	}
 	
-	public void addNotification(Notification notification) {
-		
+	public void addNotification(Notification notification, String file) {
+		getMessagesVBox().getChildren().add(loadFXML(notification, file));
 	}
 	
 	public void addMessage(Message message, String file) {
 		getMessagesVBox().getChildren().add(loadFXML(message, file));
-		System.out.println(message.getContent());
 	}
 	
     private Parent loadFXML(Notification message, String file) {
@@ -54,7 +53,7 @@ public class MessagePaneController extends Controller {
 	    		+ message.getColor().getHexStringColor() + ";", (message.getColor().isBackgroundDark() ? "WHITE" : "BLACK"));
     		} else {
     			controller = fxml.getController();
-    			((NotificationController) controller).getNotification().setText(message.getNotification());
+    			((NotificationController) controller).getNotification().setText(message.getDate() + " : " + message.getNotification());
     			((NotificationController) controller).especifyStyle("-fx-background-radius: 30; -fx-background-color: " 
     		    		+ message.getColor().getHexStringColor() + ";", (message.getColor().isBackgroundDark() ? "WHITE" : "BLACK"));
     		}

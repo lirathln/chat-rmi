@@ -29,21 +29,37 @@ public class ServerRMI extends UnicastRemoteObject implements ServerIF {
 	public synchronized void registerClient(ClientIF client) throws RemoteException {
 		getClients().add(client);
 		getPCS().firePropertyChange("registerClient", null, client);
-		getPCS().firePropertyChange("notification", null, "novo cliente"); // disparar para ClientCOntroller
+//		try {
+//			getPCS().firePropertyChange("notification", null, client.getUsername() + " entrou.");
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 	}
 	
 	@Override
 	public synchronized void removeClient(int id) throws RemoteException {
 		// TODO mandar notificações para clientes
 		getPCS().firePropertyChange("removeClient", id, null);
+//		try {
+//			getPCS().firePropertyChange("notification", null, getClients().get(id).getUsername() + " saiu.");
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 		getClients().remove(getClients().get(id));
 	}
 	
 	@Override
 	public synchronized void broadcastMessage(Message message) throws RemoteException, Exception {
 		for (ClientIF clientIF : getClients()) {
-			if (!clientIF.getUsername().equals(message.getUsername()))
-				clientIF.retrieveMessage(message);
+			if (!clientIF.getUsername().equals(((Message) message).getUsername()))
+					clientIF.retrieveMessage((Message) message);
+		}
+	}
+	
+	@Override
+	public synchronized void serverBroadcast(Notification notification) throws RemoteException, Exception {
+		for (ClientIF clientIF : getClients()) {
+			clientIF.retrieveMessage(notification);
 		}
 	}
 	
